@@ -1,11 +1,14 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
+import ExampleArt from '/components/ExampleArt';
  
 
 const Home = () => {
   const [colors, setColors] = useState([]);
   const [paletteList, setPaletteList] = useState([]);
   const [indexStart, setIndexStart] = useState(0);
+
+  const rgbaToCss = (rgba) => `rgba(${rgba.join(',')})`;
 
   // dynamic index set
   const handleIndexChange = (event) => {
@@ -46,39 +49,49 @@ const Home = () => {
   };
 
   return (
-    <div>
-      <button onClick={fetchPalette}>Generate</button>
-      <div className='flex flex-row'>
-        {colors.map((color, index) => (
-          <div key={index} style={{ backgroundColor: `rgb(${color.join(',')})`, height: '50px', width: '50px' }} />
-        ))}
-      </div>
-      <button onClick={transferColors}>Save Palette</button>
+    <div className='flex flex-row'>
       <div>
-        <div>
-          <input
-            type="number" 
-            value={indexStart} 
-            onChange={handleIndexChange} 
-            placeholder="Enter a number"
-          >
-          </input>
+        <button onClick={fetchPalette}>Generate</button>
+        <div className='flex flex-row'>
+          {colors.map((color, index) => (
+            <div key={index} style={{ backgroundColor: `rgb(${color.join(',')})`, height: '50px', width: '50px' }} />
+          ))}
         </div>
-
+        <ExampleArt
+            backgroundColor={colors[0] ? rgbaToCss(colors[0]) : '#A1ADFF'} // First color for background
+            color1={colors[1] ? rgbaToCss(colors[1]) : '#ff3118'} // Second color for SVG paths
+            color2={colors[2] ? rgbaToCss(colors[2]) : '#c66300'} // Third color for SVG paths
+            color3={colors[3] ? rgbaToCss(colors[3]) : '#ff945a'} // Default color or third color from the palette
+        />
+        <button onClick={transferColors}>Save Palette</button>
+        <div>
+          <div>
+            <input
+              type="number" 
+              value={indexStart} 
+              onChange={handleIndexChange} 
+              placeholder="Enter a number"
+            >
+            </input>
+          </div>
+      </div>
+      <div>
         <h3>JSON Output</h3>
         <button onClick={copyToClipboard}>Copy JSON</button>
-      <pre style={codeBlockStyles}>
-        <code>
-          <div ref={jsonRef}>
-            {paletteList.map((item, index) => (
-              <div key={index}>
-              {`${index + indexStart}: { theme: ${item.theme ? `'${item.theme}'` : null}, palette: [${item.palette.map(rgb => `'#${rgb.map(v => v.toString(16).padStart(2, '0')).join('')}'`).join(', ')}] },`}
+        <pre style={codeBlockStyles}>
+          <code>
+            <div ref={jsonRef}>
+              {paletteList.map((item, index) => (
+                <div key={index}>
+                {`${index + indexStart}: { theme: ${item.theme ? `'${item.theme}'` : null}, palette: [${item.palette.map(rgb => `'#${rgb.map(v => v.toString(16).padStart(2, '0')).join('')}'`).join(', ')}] },`}
+              </div>
+              ))}
             </div>
-            ))}
-          </div>
-        </code>
-      </pre>
+          </code>
+        </pre>
 
+        </div>
+        
       </div>
     </div>
   );
